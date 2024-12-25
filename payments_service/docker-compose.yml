@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  payments_service:
+    build:
+      context: .
+    ports:
+      - "8003:8000"
+    volumes:
+      - .:/app
