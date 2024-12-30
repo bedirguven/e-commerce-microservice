@@ -1,0 +1,68 @@
+version: "3.9"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"    # RabbitMQ için mesajlaşma portu
+      - "15672:15672"  # RabbitMQ yönetim konsolu
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  users_service:
+    build:
+      context: ./services/users_service
+    container_name: users_service
+    ports:
+      - "8001:8000"
+    depends_on:
+      - rabbitmq
+    environment:
+      DJANGO_SETTINGS_MODULE: users_service.settings
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+    volumes:
+      - ./services/users_service:/app
+
+  orders_service:
+    build:
+      context: ./services/orders_service
+    container_name: orders_service
+    ports:
+      - "8002:8000"
+    depends_on:
+      - rabbitmq
+    environment:
+      DJANGO_SETTINGS_MODULE: orders_service.settings
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+    volumes:
+      - ./services/orders_service:/app
+
+  products_service:
+    build:
+      context: ./services/products_service
+    container_name: products_service
+    ports:
+      - "8003:8000"
+    depends_on:
+      - rabbitmq
+    environment:
+      DJANGO_SETTINGS_MODULE: products_service.settings
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+    volumes:
+      - ./services/products_service:/app
+
+  payments_service:
+    build:
+      context: ./services/payments_service
+    container_name: payments_service
+    ports:
+      - "8004:8000"
+    depends_on:
+      - rabbitmq
+    environment:
+      DJANGO_SETTINGS_MODULE: payments_service.settings
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+    volumes:
+      - ./services/payments_service:/app

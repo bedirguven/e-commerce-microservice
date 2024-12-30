@@ -1,9 +1,0 @@
-version: '3.8'
-services:
-  users_service:
-    build:
-      context: .
-    ports:
-      - "8001:8000"
-    volumes:
-      - .:/app

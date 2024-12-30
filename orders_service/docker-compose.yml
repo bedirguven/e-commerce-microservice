@@ -1,9 +1,0 @@
-version: '3.8'
-services:
-  orders_service:
-    build:
-      context: .
-    ports:
-      - "8002:8000"
-    volumes:
-      - .:/app
