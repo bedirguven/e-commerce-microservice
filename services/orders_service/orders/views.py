@@ -33,3 +33,22 @@ class OrderListCreateAPIView(APIView):
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class OrderDetailAPIView(APIView):
+
+    def get(self, request, order_id):
+        # Cache kontrolü
+        cache_key = f"order_detail_{order_id}"
+        cached_data = cache.get(cache_key)
+
+        if cached_data:
+            return Response(cached_data, status=status.HTTP_200_OK)
+
+        # Cache yoksa veritabanından getir ve cache'e ekle
+        try:
+            order = Order.objects.get(id=order_id)
+            serializer = OrderSerializer(order)
+            cache.set(cache_key, serializer.data, timeout=3600)  # Cache süresi: 1 saat
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Order.DoesNotExist:
+            return Response({"message": "Order not found"}, status=status.HTTP_404_NOT_FOUND)

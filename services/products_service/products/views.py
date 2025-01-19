@@ -11,8 +11,16 @@ class ProductListCreateAPIView(APIView):
     Ürün listeleme ve yeni ürün oluşturma API'si.
     """
     def get(self, request):
+        # Cache kontrolü
+        cache_key = "product_list"
+        cached_data = cache.get(cache_key)
+
+        if cached_data:
+            return Response(cached_data, status=status.HTTP_200_OK)
+
         products = Product.objects.all()
         serializer = ProductSerializer(products, many=True)
+        cache.set(cache_key, serializer.data, timeout=3600)  # Cache süresi: 1 saat
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
